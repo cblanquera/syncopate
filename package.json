@@ -1,7 +1,7 @@
 {
   "name": "syncopate",
   "description": "Turn async to sync in JS",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": {
     "name": "Christian Blanquera",
     "email": "cblanquera@openovate.com"

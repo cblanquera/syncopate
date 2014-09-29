@@ -79,7 +79,7 @@ var syncopate = function() {
 		if(typeof process === 'object' 
 		&& typeof process.nextTick === 'function') {
 			//async call
-			process.nextTick(function() {
+			setImmediate(function() {
 				//do the callback
 				callback.apply(scope, args);
 			});
@@ -102,7 +102,7 @@ var syncopate = function() {
 			if(typeof process === 'object' 
 			&& typeof process.nextTick === 'function') {
 				//async call
-				process.nextTick(function() {
+				setImmediate(function() {
 					//do the callback
 					threads[thread].apply(scope, args);
 				});
