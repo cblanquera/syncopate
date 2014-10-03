@@ -1,3 +1,11 @@
+/**
+ * Syncopate - Turn async to sync in JS
+ *
+ * @version 0.0.3
+ * @author Christian Blanquera <cblanquera@openovate.com>
+ * @website https://github.com/cblanquera/syncopate
+ * @license MIT
+ */
 (function() {
 	/* Definition
 	-------------------------------*/
