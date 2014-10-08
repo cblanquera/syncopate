@@ -14,15 +14,45 @@
 		-------------------------------*/
 		/* Properties
 		-------------------------------*/
-		var methods = {},
-			threads = {},
-			stack	= [],
-			args	= [],
-			working	= false,
-			scope	= methods;
+		var methods 	= {},
+			threads 	= {},
+			stack		= [],
+			args		= [],
+			onNext 		= function() {},
+			onThread 	= function() {},
+			working		= false,
+			scope		= methods;
 		
 		/* Public Methods
 		-------------------------------*/
+		/**
+		 * API callback for connecting with larger systems.
+		 * Callback will be called when next has been called.
+		 * This is a sumple integration that works for client
+		 * and Node without casing between the two event handlers.
+		 *
+		 * @param function
+		 * @return this
+		 */
+		methods.onNext = function(callback) {
+			onNext = callback;
+			return this;
+		};
+		
+		/**
+		 * API callback for connecting with larger systems.
+		 * Callback will be called when next has been called.
+		 * This is a sumple integration that works for client
+		 * and Node without casing between the two event handlers.
+		 *
+		 * @param function
+		 * @return this
+		 */
+		methods.onThread = function(callback) {
+			onThread = callback;
+			return this;
+		};
+		
 		/**
 		 * Sets the scope for all then and thread callbacks
 		 *
@@ -32,6 +62,15 @@
 		methods.scope = function(object) {
 			scope = object;
 			return this;
+		};
+		
+		/**
+		 * Returns the stack 
+		 *
+		 * @return array
+		 */
+		methods.stack = function() {
+			return stack;
 		};
 		
 		/**
@@ -64,6 +103,15 @@
 			return this;
 		};
 		
+		/**
+		 * Returns the threads 
+		 *
+		 * @return array
+		 */
+		methods.threads = function() {
+			return threads;
+		};
+		
 		/* Private Methods
 		-------------------------------*/
 		var _next = function() {
@@ -73,6 +121,9 @@
 				//save it for now and wait for when they call then()
 				working = false;
 				args 	= Array.prototype.slice.apply(arguments);
+				
+				//it got called lets trigger
+				onNext.call(scope, null, stack);
 				return;
 			}
 			
@@ -90,6 +141,9 @@
 				setImmediate(function() {
 					//do the callback
 					callback.apply(scope, args);
+				
+					//it got called lets trigger
+					onNext.call(scope, callback, stack);
 				});
 				
 				return;
@@ -97,6 +151,9 @@
 			
 			//do the callback
 			callback.apply(scope, args);
+		
+			//it got called lets trigger
+			onNext.call(scope, callback, stack);		
 		};
 		
 		_next.thread = function() {
@@ -112,6 +169,9 @@
 					setImmediate(function() {
 						//do the callback
 						threads[thread].apply(scope, args);
+					
+						//it got called lets trigger
+						onThread.call(scope, threads[thread], stack);
 					});
 					
 					return;
@@ -119,6 +179,9 @@
 				
 				//do the callback
 				threads[thread].apply(scope, args);
+				
+				//it got called lets trigger
+				onThread.call(scope, threads[thread], stack);
 			}
 		};
 		
