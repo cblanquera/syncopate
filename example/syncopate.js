@@ -1,7 +1,7 @@
 /**
  * Syncopate - Turn async to sync in JS
  *
- * @version 0.0.3
+ * @version 0.0.4
  * @author Christian Blanquera <cblanquera@openovate.com>
  * @website https://github.com/cblanquera/syncopate
  * @license MIT
@@ -135,25 +135,15 @@
 			
 			args.push(next);
 			
-			//can we async it?
-			if(typeof setImmediate === 'function') {
-				//async call
-				setImmediate(function() {
-					//do the callback
-					callback.apply(scope, args);
-				
-					//it got called lets trigger
-					onNext.call(scope, callback, stack);
-				});
-				
-				return;
-			}
+			var tick = typeof setImmediate === 'function' ? setImmediate : setTimeout;
 			
-			//do the callback
-			callback.apply(scope, args);
-		
-			//it got called lets trigger
-			onNext.call(scope, callback, stack);		
+			tick(function() {
+				//do the callback
+				callback.apply(scope, args);
+			
+				//it got called lets trigger
+				onNext.call(scope, callback, stack);
+			});		
 		};
 		
 		_next.thread = function() {
@@ -163,25 +153,16 @@
 			args.push(_next);
 			
 			if(typeof threads[thread] === 'function') {
-				//can we async it?
-				if(typeof setImmediate === 'function') {
-					//async call
-					setImmediate(function() {
-						//do the callback
-						threads[thread].apply(scope, args);
-					
-						//it got called lets trigger
-						onThread.call(scope, threads[thread], stack);
-					});
-					
-					return;
-				}
+				var tick = typeof setImmediate === 'function' ? setImmediate : setTimeout;
 				
-				//do the callback
-				threads[thread].apply(scope, args);
+				//async call
+				tick(function() {
+					//do the callback
+					threads[thread].apply(scope, args);
 				
-				//it got called lets trigger
-				onThread.call(scope, threads[thread], stack);
+					//it got called lets trigger
+					onThread.call(scope, threads[thread], stack);
+				});
 			}
 		};
 		
